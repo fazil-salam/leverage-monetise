@@ -96,19 +96,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   refreshCounter();
 
-  // Form Validation, Phone OTP Verification & Submission
+  // Form Validation & Submission
   const form = document.getElementById('ideaSubmissionForm');
   const companyWebsiteInput = document.getElementById('companyWebsite');
   const fullNameInput = document.getElementById('fullName');
   const emailInput = document.getElementById('email');
   const phoneInput = document.getElementById('phone');
-  const sendOtpBtn = document.getElementById('sendOtpBtn');
-  const otpVerificationBox = document.getElementById('otpVerificationBox');
-  const otpDispatchNotice = document.getElementById('otpDispatchNotice');
-  const otpCodeInput = document.getElementById('otpCode');
-  const verifyOtpBtn = document.getElementById('verifyOtpBtn');
-  const phoneVerifiedBadge = document.getElementById('phoneVerifiedBadge');
-
   const coreIdeaInput = document.getElementById('coreIdea');
   const agreedInput = document.getElementById('agreed');
 
@@ -117,128 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const submitBtn = document.getElementById('submitBtn');
   const submitBtnText = document.getElementById('submitBtnText');
   const successPanel = document.getElementById('submissionSuccessPanel');
-
-  let verifiedPhoneToken = null;
-  let verifiedPhoneNumber = null;
-
-  // Reset verification if phone number is edited
-  if (phoneInput) {
-    phoneInput.addEventListener('input', () => {
-      if (verifiedPhoneNumber && phoneInput.value.trim() !== verifiedPhoneNumber) {
-        verifiedPhoneToken = null;
-        verifiedPhoneNumber = null;
-        phoneVerifiedBadge.classList.add('hidden');
-        sendOtpBtn.textContent = 'Send OTP';
-        sendOtpBtn.disabled = false;
-      }
-    });
-  }
-
-  // Send OTP Handler
-  if (sendOtpBtn) {
-    sendOtpBtn.addEventListener('click', async () => {
-      const rawPhone = phoneInput.value.trim();
-      const digits = rawPhone.replace(/\D/g, '');
-      if (digits.length < 7 || digits.length > 15) {
-        setFieldError('phone', 'Please enter a valid phone number with country code (e.g., +1 437 707 4889).');
-        return;
-      }
-
-      setFieldError('phone', '');
-      sendOtpBtn.disabled = true;
-      sendOtpBtn.textContent = 'Sending...';
-
-      try {
-        const res = await fetch(`${basePath}/api/send-otp`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            phone: rawPhone,
-            email: emailInput ? emailInput.value.trim() : ''
-          })
-        });
-        const data = await res.json();
-        if (!res.ok || !data.ok) {
-          setFieldError('phone', data.error || 'Failed to send OTP. Please check your number.');
-          sendOtpBtn.disabled = false;
-          sendOtpBtn.textContent = 'Send OTP';
-          return;
-        }
-
-        phoneInput.value = data.phone;
-        otpVerificationBox.classList.remove('hidden');
-        otpDispatchNotice.textContent = '';
-
-        if (data.dispatchCode) {
-          otpDispatchNotice.appendChild(
-            document.createTextNode(`Verification code generated for ${data.phone}: `)
-          );
-          const codeStrong = document.createElement('strong');
-          codeStrong.textContent = data.dispatchCode;
-          otpDispatchNotice.appendChild(codeStrong);
-          otpDispatchNotice.appendChild(
-            document.createTextNode(' — Enter this 6-digit code below to verify.')
-          );
-        } else {
-          otpDispatchNotice.textContent = data.message || `Enter the 6-digit OTP sent to ${data.phone}.`;
-        }
-
-        otpCodeInput.focus();
-        sendOtpBtn.textContent = 'Resend OTP';
-        sendOtpBtn.disabled = false;
-      } catch (err) {
-        setFieldError('phone', 'Network error sending OTP. Please try again.');
-        sendOtpBtn.disabled = false;
-        sendOtpBtn.textContent = 'Send OTP';
-      }
-    });
-  }
-
-  // Verify OTP Handler
-  if (verifyOtpBtn) {
-    verifyOtpBtn.addEventListener('click', async () => {
-      const rawPhone = phoneInput.value.trim();
-      const code = otpCodeInput.value.trim();
-      if (!/^\d{6}$/.test(code)) {
-        setFieldError('phone', 'Please enter the 6-digit numeric OTP code.');
-        return;
-      }
-
-      setFieldError('phone', '');
-      verifyOtpBtn.disabled = true;
-      verifyOtpBtn.textContent = 'Verifying...';
-
-      try {
-        const res = await fetch(`${basePath}/api/verify-otp`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: rawPhone, code })
-        });
-        const data = await res.json();
-        if (!res.ok || !data.ok) {
-          setFieldError('phone', data.error || 'Invalid OTP code.');
-          verifyOtpBtn.disabled = false;
-          verifyOtpBtn.textContent = 'Verify Code';
-          return;
-        }
-
-        verifiedPhoneToken = data.phoneVerificationToken;
-        verifiedPhoneNumber = data.phone;
-        phoneInput.value = data.phone;
-
-        otpVerificationBox.classList.add('hidden');
-        phoneVerifiedBadge.classList.remove('hidden');
-        sendOtpBtn.textContent = 'Verified ✓';
-        sendOtpBtn.disabled = true;
-        setFieldError('phone', '');
-      } catch (err) {
-        setFieldError('phone', 'Network error verifying OTP. Please try again.');
-      } finally {
-        verifyOtpBtn.disabled = false;
-        verifyOtpBtn.textContent = 'Verify Code';
-      }
-    });
-  }
 
   // Live Character Count for "The Core Idea" (Minimum 150 characters)
   if (coreIdeaInput) {
@@ -290,8 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const phone = phoneInput.value.trim();
-    if (!phone || !verifiedPhoneToken || phone !== verifiedPhoneNumber) {
-      setFieldError('phone', 'Required. Please enter your phone number, click "Send OTP", and verify the 6-digit code before submitting.');
+    const digitsOnly = phone.replace(/\D/g, '');
+    if (digitsOnly.length < 7 || digitsOnly.length > 15) {
+      setFieldError('phone', 'Required. Please enter a valid phone number.');
       valid = false;
     } else {
       setFieldError('phone', '');
@@ -334,8 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             companyWebsite: companyWebsiteInput ? companyWebsiteInput.value : '',
             fullName: fullNameInput.value.trim(),
             email: emailInput.value.trim(),
-            phone: verifiedPhoneNumber,
-            phoneVerificationToken: verifiedPhoneToken,
+            phone: phoneInput.value.trim(),
             coreIdea: coreIdeaInput.value.trim(),
             agreed: agreedInput.checked
           })
@@ -360,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('certCreatorName').textContent = result.record.fullName;
         document.getElementById('certCreatorEmail').textContent = result.record.email;
         const certPhoneEl = document.getElementById('certCreatorPhone');
-        if (certPhoneEl) certPhoneEl.textContent = `${result.record.phone} (OTP Verified)`;
+        if (certPhoneEl) certPhoneEl.textContent = result.record.phone;
         document.getElementById('certHash').textContent = result.record.signatureHash.slice(0, 32) + '...';
         document.getElementById('downloadAgreementBtn').href = `${basePath}${result.record.agreementUrl}`;
 
@@ -379,12 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (submitAnotherBtn) {
     submitAnotherBtn.addEventListener('click', () => {
       form.reset();
-      verifiedPhoneToken = null;
-      verifiedPhoneNumber = null;
-      phoneVerifiedBadge.classList.add('hidden');
-      otpVerificationBox.classList.add('hidden');
-      sendOtpBtn.textContent = 'Send OTP';
-      sendOtpBtn.disabled = false;
       charCounter.textContent = '0 / 150 min characters';
       charProgressBar.style.width = '0%';
       charCounter.classList.remove('valid');

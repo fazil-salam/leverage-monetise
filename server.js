@@ -129,13 +129,13 @@ function sanitizeText(input, maxLen = 2000) {
     .slice(0, maxLen);
 }
 
-// Normalize phone number (keep leading + and digits)
+// Normalize phone number
 function normalizePhone(input) {
   if (typeof input !== 'string') return '';
-  const cleaned = input.replace(/[^\d+]/g, '');
+  const cleaned = input.replace(/[^\d+()\-\s]/g, '').trim();
   const digitsOnly = cleaned.replace(/\D/g, '');
   if (digitsOnly.length < 7 || digitsOnly.length > 15) return '';
-  return cleaned.startsWith('+') ? `+${digitsOnly}` : `+${digitsOnly}`;
+  return cleaned.slice(0, 24);
 }
 
 // Helper to read/write local database atomically
@@ -194,20 +194,20 @@ function generateAgreementPDF(record, outputPath) {
       );
     y = doc.y + 12;
 
-    // 3. Metadata Box (Includes Verified Phone Number)
+    // 3. Metadata Box (Includes Phone Number)
     const metaHeight = 86;
     doc.roundedRect(45, y, doc.page.width - 90, metaHeight, 6).fillAndStroke('#F8FAFC', '#E2E8F0');
     doc.fillColor('#0F172A').fontSize(8.5).font('Helvetica-Bold');
     doc.text('REGISTRATION ID:', 60, y + 12, { lineBreak: false });
     doc.text('CREATOR NAME:', 60, y + 29, { lineBreak: false });
     doc.text('VERIFIED EMAIL:', 60, y + 46, { lineBreak: false });
-    doc.text('VERIFIED PHONE:', 60, y + 63, { lineBreak: false });
+    doc.text('PHONE NUMBER:', 60, y + 63, { lineBreak: false });
 
     doc.fillColor('#334155').fontSize(8.5).font('Helvetica');
     doc.text(`${record.uniqueId} (SHA-256 Hash: ${record.signatureHash.slice(0, 24)}...)`, 175, y + 12, { lineBreak: false });
     doc.text(record.fullName, 175, y + 29, { lineBreak: false });
     doc.text(record.email, 175, y + 46, { lineBreak: false });
-    doc.text(`${record.phone || 'Verified'} (OTP Verified)`, 175, y + 63, { lineBreak: false });
+    doc.text(record.phone || '—', 175, y + 63, { lineBreak: false });
 
     y += metaHeight + 14;
 
@@ -257,7 +257,7 @@ function generateAgreementPDF(record, outputPath) {
     y += 14;
     doc.fillColor('#334155').fontSize(8.8).font('Helvetica')
       .text(
-        'If our engineering and product team requires additional clarity, feature specifications, or audience insights, we will reach out to you directly via email (leveragemonetise@gmail.com) and your verified phone number to collaborate and build the most complete, high-converting digital product possible from your idea.',
+        'If our engineering and product team requires additional clarity, feature specifications, or audience insights, we will reach out to you directly via email (leveragemonetise@gmail.com) to collaborate and build the most complete, high-converting digital product possible from your idea.',
         45, y, { width: doc.page.width - 90, lineGap: 2 }
       );
     y = doc.y + 18;
@@ -283,7 +283,7 @@ function generateAgreementPDF(record, outputPath) {
     y += 12;
 
     doc.text('Email: leveragemonetise@gmail.com', 45, y, { lineBreak: false });
-    doc.text(`Verification ID: ${record.uniqueId}  |  Phone: ${record.phone || 'Verified'}`, 315, y, { lineBreak: false });
+    doc.text(`Verification ID: ${record.uniqueId}`, 315, y, { lineBreak: false });
 
     doc.end();
     stream.on('finish', () => resolve(outputPath));
@@ -453,10 +453,10 @@ app.post('/api/verify-otp', otpLimiter, (req, res) => {
   });
 });
 
-// POST /api/submit — Validates form + verified OTP token, generates Unique ID + PDF IP Agreement
+// POST /api/submit — Validates form, generates Unique ID + PDF IP Agreement
 app.post('/api/submit', submitLimiter, async (req, res) => {
   try {
-    const { companyWebsite, fullName, email, phone, phoneVerificationToken, coreIdea, agreed } = req.body || {};
+    const { companyWebsite, fullName, email, phone, coreIdea, agreed } = req.body || {};
 
     // Honeypot bot check
     if (companyWebsite && String(companyWebsite).trim().length > 0) {
@@ -480,12 +480,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
     }
 
     if (!cleanPhone) {
-      errors.phone = 'Valid phone number is required.';
-    } else {
-      const otpSession = otpStore.get(cleanPhone);
-      if (!otpSession || !otpSession.verified || !phoneVerificationToken || otpSession.token !== phoneVerificationToken) {
-        errors.phone = 'Please verify your phone number with the 6-digit OTP before submitting.';
-      }
+      errors.phone = 'Please enter a valid phone number.';
     }
 
     if (!cleanIdea || cleanIdea.length < 150) {
@@ -499,9 +494,6 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
     if (Object.keys(errors).length > 0) {
       return res.status(400).json({ ok: false, errors });
     }
-
-    // Consume OTP session so it cannot be replayed
-    otpStore.delete(cleanPhone);
 
     const submissions = getSubmissions();
     const sequenceNum = BASE_OFFSET + submissions.length + 1;
@@ -518,7 +510,6 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
       fullName: cleanName,
       email: cleanEmail,
       phone: cleanPhone,
-      phoneVerified: true,
       coreIdea: cleanIdea,
       agreed: true,
       createdAt,

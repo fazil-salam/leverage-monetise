@@ -464,52 +464,21 @@
             <p class="field-error" id="error-email" role="alert"></p>
           </div>
 
-          <!-- Field 3: Phone Number & OTP Verification -->
+          <!-- Field 3: Phone Number -->
           <div class="form-group">
-            <div class="label-row">
-              <label for="phone" class="form-label">
-                Phone Number (OTP Verification Required) <span class="required-star">*</span>
-              </label>
-              <span class="otp-verified-badge hidden" id="phoneVerifiedBadge">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                OTP Verified
-              </span>
-            </div>
-            <p class="form-subtext">Include your country code (e.g., <code>+1 437 707 4889</code>) and verify with a 6-digit OTP before submitting.</p>
-            <div class="phone-input-row">
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                class="form-input"
-                placeholder="+1 437 707 4889"
-                maxlength="24"
-                required
-                autocomplete="tel"
-              />
-              <button type="button" id="sendOtpBtn" class="btn btn-otp">
-                Send OTP
-              </button>
-            </div>
-
-            <!-- OTP Verification Drawer (Appears after clicking Send OTP) -->
-            <div id="otpVerificationBox" class="otp-box hidden">
-              <p class="otp-dispatch-notice" id="otpDispatchNotice"></p>
-              <div class="otp-verify-row">
-                <input
-                  type="text"
-                  id="otpCode"
-                  class="form-input otp-code-input"
-                  placeholder="Enter 6-digit OTP"
-                  maxlength="6"
-                  inputmode="numeric"
-                  autocomplete="one-time-code"
-                />
-                <button type="button" id="verifyOtpBtn" class="btn btn-verify-otp">
-                  Verify Code
-                </button>
-              </div>
-            </div>
+            <label for="phone" class="form-label">
+              Phone Number <span class="required-star">*</span>
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              class="form-input"
+              placeholder="Enter your phone number"
+              maxlength="24"
+              required
+              autocomplete="tel"
+            />
             <p class="field-error" id="error-phone" role="alert"></p>
           </div>
 
@@ -581,8 +550,8 @@
               <span class="cert-val" id="certCreatorEmail">—</span>
             </div>
             <div class="cert-row">
-              <span class="cert-key">VERIFIED PHONE:</span>
-              <span class="cert-val text-lime" id="certCreatorPhone">—</span>
+              <span class="cert-key">PHONE NUMBER:</span>
+              <span class="cert-val" id="certCreatorPhone">—</span>
             </div>
             <div class="cert-row">
               <span class="cert-key">CRYPTOGRAPHIC SHA-256:</span>
