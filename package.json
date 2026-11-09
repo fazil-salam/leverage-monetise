@@ -1,0 +1,17 @@
+{
+  "name": "leverage-monetise",
+  "version": "1.0.0",
+  "description": "Leverage Monetise — Exclusive Partnership Hub for AI Income Challenge Members",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.14",
+    "pdfkit": "^0.15.0"
+  }
+}
