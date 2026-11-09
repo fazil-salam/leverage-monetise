@@ -61,8 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Determine base path so API calls work whether hosted at / or /leverage-monetise/
-  const basePath = window.location.pathname.startsWith('/leverage-monetise') ? '/leverage-monetise' : '';
+  // Determine base path so API calls work whether hosted at / or /the-lever-project/
+  const basePath = window.location.pathname.startsWith('/the-lever-project') ? '/the-lever-project' : '';
 
   // Fetch Live Counter from Backend (Airtable + Local DB)
   async function refreshCounter() {
