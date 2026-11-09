@@ -12,7 +12,7 @@ const nodemailer = require('nodemailer');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const BASE_OFFSET = parseInt(process.env.BASE_COUNTER_OFFSET || '14', 10);
-const SENDER_EMAIL = process.env.SMTP_EMAIL || 'support@theleverproject.com';
+const SENDER_EMAIL = process.env.SMTP_EMAIL || 'theleverproject@gmail.com';
 
 // Trust Nginx & Cloudflare reverse proxy for accurate client IP rate-limiting
 app.set('trust proxy', 1);
@@ -423,7 +423,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
       }
     }
 
-    // 5. Optional Direct Email Delivery from support@theleverproject.com
+    // 5. Optional Direct Email Delivery from theleverproject@gmail.com
     let emailSent = false;
     if (process.env.SMTP_EMAIL && process.env.SMTP_APP_PASSWORD) {
       try {

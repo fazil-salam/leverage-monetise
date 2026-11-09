@@ -19,7 +19,7 @@ An exclusive partnership hub for **AI Income Challenge** members who want to lau
    - **Phase 1 (The Recoup Phase)**: `50/50 Split` until the initial `$1,997 USD` challenge investment is covered.
    - **Phase 2 (The Growth Phase)**: `70/30 Split` (`70%` Creator for bringing the idea / `30%` The Lever Project for technical management, buyer matching & platform fees).
 6. **Section 5 — IP Protection**:
-   - Instant Tracking (`ID-001`, `ID-002`, ...), Immediate Validation, and Signed PDF IP Ownership Agreement from **The Lever Project** (`support@theleverproject.com`).
+   - Instant Tracking (`ID-001`, `ID-002`, ...), Immediate Validation, and Signed PDF IP Ownership Agreement from **The Lever Project** (`theleverproject@gmail.com`).
 7. **Section 6 — Validated Application Form & Automated Backend**:
    - Collects First & Last Name, Email Address, Phone Number, The Core Idea (minimum 150 characters), and mandatory Agreement Checkbox.
    - Automatically generates a downloadable **Signed PDF IP Ownership Agreement** (`GET /api/agreement/:uniqueId`) under **The Lever Project**.
