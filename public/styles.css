@@ -1337,6 +1337,85 @@ body {
   pointer-events: none;
 }
 
+/* Phone Number & OTP Verification Styles */
+.phone-input-row,
+.otp-verify-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.btn-otp {
+  background: linear-gradient(135deg, var(--accent-blue-dark), var(--accent-blue));
+  color: var(--text-white);
+  padding: 0 22px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 6px 20px rgba(21, 112, 239, 0.3);
+}
+
+.btn-otp:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(56, 139, 255, 0.45);
+}
+
+.otp-box {
+  margin-top: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(14, 18, 46, 0.9);
+  border: 1px solid var(--border-blue);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.otp-dispatch-notice {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.otp-dispatch-notice strong {
+  font-family: var(--font-mono);
+  color: var(--accent-lime);
+  background: rgba(159, 239, 0, 0.14);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+}
+
+.otp-code-input {
+  font-family: var(--font-mono);
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  text-align: center;
+}
+
+.btn-verify-otp {
+  background: linear-gradient(135deg, #9fef00 0%, #7ad000 100%);
+  color: #02050a;
+  padding: 0 22px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.otp-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--accent-lime);
+  background: rgba(159, 239, 0, 0.14);
+  border: 1px solid var(--border-lime);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
 /* Mobile Navigation Toggle & Drawer */
 .nav-actions {
   display: flex;
@@ -1534,6 +1613,17 @@ body {
 
   .form-input {
     font-size: 16px; /* Prevents iOS Safari auto-zoom on input focus */
+  }
+
+  .phone-input-row,
+  .otp-verify-row {
+    flex-direction: column;
+  }
+
+  .btn-otp,
+  .btn-verify-otp {
+    padding: 13px 18px;
+    width: 100%;
   }
 
   .success-actions {
