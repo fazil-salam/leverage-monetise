@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Leverage Monetise — Pull The Lever Together | AI Income Challenge Partnership Hub</title>
-  <meta name="description" content="An exclusive partnership hub for AI Income Challenge members who want to launch digital products without fronting the massive software costs. You bring the idea. I'll bring the $3,000 tool." />
+  <meta name="description" content="An exclusive partnership hub for AI Income Challenge members who want to launch digital products without fronting the massive software costs. You bring the idea. I'll bring the tool worth $19,458+." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
@@ -48,7 +48,7 @@
         </div>
       </a>
 
-      <div class="nav-links">
+      <div class="nav-links" id="navLinks">
         <a href="#how-it-works" class="nav-link">How it Works</a>
         <a href="#the-split" class="nav-link">The Split</a>
         <a href="#ip-protection" class="nav-link">IP Protection</a>
@@ -59,8 +59,18 @@
           <span>Submit Idea</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
+        <button type="button" class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Navigation Menu" aria-expanded="false">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
       </div>
     </nav>
+    <!-- Mobile Drawer -->
+    <div class="mobile-nav-drawer hidden" id="mobileNavDrawer">
+      <a href="#how-it-works" class="mobile-nav-link">How it Works</a>
+      <a href="#the-split" class="mobile-nav-link">The Split</a>
+      <a href="#ip-protection" class="mobile-nav-link">IP Protection</a>
+      <a href="#submit-idea" class="btn btn-primary mobile-nav-cta">Submit Your Idea</a>
+    </div>
   </header>
 
   <main>
@@ -71,7 +81,7 @@
       </div>
 
       <h1 class="hero-headline">
-        You Bring the Idea. I’ll Bring the <span class="highlight-price">$3,000 Tool.</span>
+        You Bring the Idea. I’ll Bring the <span class="highlight-price">$19,458+ Tool.</span>
         <span class="headline-sub-accent">Let’s Pull the Lever Together.</span>
       </h1>
 
@@ -106,7 +116,7 @@
           <div class="banner-overlay-stats">
             <div class="mini-stat">
               <span class="mini-stat-label">SOFTWARE ACCESS</span>
-              <span class="mini-stat-val">$3,000 Tool Covered</span>
+              <span class="mini-stat-val">Tool Worth $19,458+ Covered</span>
             </div>
             <div class="mini-stat-divider"></div>
             <div class="mini-stat">
@@ -135,7 +145,7 @@
 
         <div class="letter-body">
           <p class="letter-lead">
-            “I know you are all a part of the AI Income Challenge. But let’s be real—not everyone can afford a <strong>$3,000 tool</strong> to build their ideas right out of the gate.
+            “I know you are all a part of the AI Income Challenge. But let’s be real—not everyone can afford a <strong>tool worth $19,458+</strong> ($3,000 upfront) to build their ideas right out of the gate.
           </p>
           <p>
             I am not discouraging anyone from buying the tool. But what if you are a student? What if you are just getting started and your budget is tight? I have been in that exact phase.
@@ -150,11 +160,8 @@
             <div class="sig-avatar">LM</div>
             <div>
               <div class="sig-name">Founder, Leverage Monetise</div>
-              <div class="sig-role">AI Income Challenge Builder Partner • leveragemonetise@gmail.com</div>
+              <div class="sig-role">VIP member of AI Income Challenge • leveragemonetise@gmail.com</div>
             </div>
-          </div>
-          <div class="letter-seal">
-            <span class="seal-text">VERIFIED PARTNER HUB</span>
           </div>
         </div>
       </div>
@@ -181,11 +188,11 @@
           <div class="strategy-steps-mini">
             <div class="step-pill">
               <span class="step-num">01</span>
-              <span>You Pitch the Core Idea &amp; Traffic Channel</span>
+              <span>You Pitch the Core Idea</span>
             </div>
             <div class="step-pill">
               <span class="step-num">02</span>
-              <span>I Build It Using the $3,000 Monetise AI System</span>
+              <span>I Build It Using the Monetise AI System (Worth $19,458+)</span>
             </div>
             <div class="step-pill">
               <span class="step-num">03</span>
@@ -209,7 +216,7 @@
             <div class="reel-plus">+</div>
             <div class="reel-box">
               <span class="reel-label">ENGINE</span>
-              <span class="reel-value text-blue" id="reel2">$3,000 AI TOOL</span>
+              <span class="reel-value text-blue" id="reel2">$19,458+ AI TOOL</span>
             </div>
             <div class="reel-plus">=</div>
             <div class="reel-box reel-jackpot">
@@ -414,6 +421,12 @@
         </div>
 
         <form id="ideaSubmissionForm" class="idea-form" novalidate>
+          <!-- Anti-bot Honeypot Field (Hidden from real users) -->
+          <div class="hp-trap" aria-hidden="true">
+            <label for="companyWebsite">Company Website</label>
+            <input type="text" id="companyWebsite" name="companyWebsite" tabindex="-1" autocomplete="off" />
+          </div>
+
           <!-- Field 1: First & Last Name -->
           <div class="form-group">
             <label for="fullName" class="form-label">
@@ -425,6 +438,7 @@
               name="fullName"
               class="form-input"
               placeholder="e.g., Abdul Fazil"
+              maxlength="120"
               required
               autocomplete="name"
             />
@@ -443,30 +457,14 @@
               name="email"
               class="form-input"
               placeholder="you@example.com"
+              maxlength="160"
               required
               autocomplete="email"
             />
             <p class="field-error" id="error-email" role="alert"></p>
           </div>
 
-          <!-- Field 3: Traffic Source / Social Link -->
-          <div class="form-group">
-            <label for="trafficSource" class="form-label">
-              Traffic Source / Social Link <span class="required-star">*</span>
-            </label>
-            <p class="form-subtext">Where will you market this? (TikTok, IG, YouTube, Email List) — Must start with <code>https://</code></p>
-            <input
-              type="url"
-              id="trafficSource"
-              name="trafficSource"
-              class="form-input"
-              placeholder="https://www.instagram.com/yourhandle"
-              required
-            />
-            <p class="field-error" id="error-trafficSource" role="alert"></p>
-          </div>
-
-          <!-- Field 4: The Core Idea -->
+          <!-- Field 3: The Core Idea -->
           <div class="form-group">
             <div class="label-row">
               <label for="coreIdea" class="form-label">

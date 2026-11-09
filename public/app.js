@@ -3,6 +3,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const nextIdTag = document.getElementById('nextIdTag');
   const formNextId = document.getElementById('formNextId');
 
+  // Mobile Menu Drawer Toggle
+  const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+  const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+
+  if (mobileMenuToggle && mobileNavDrawer) {
+    mobileMenuToggle.addEventListener('click', () => {
+      const isHidden = mobileNavDrawer.classList.toggle('hidden');
+      mobileMenuToggle.setAttribute('aria-expanded', String(!isHidden));
+    });
+
+    mobileNavDrawer.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        mobileNavDrawer.classList.add('hidden');
+        mobileMenuToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
   // Slot Machine Interactive Lever
   const pullLeverBtn = document.getElementById('pullLeverBtn');
   const reel1 = document.getElementById('reel1');
@@ -34,9 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
           const selected = sampleIdeas[leverIndex % sampleIdeas.length];
           leverIndex++;
           reel1.textContent = selected.idea;
-          reel2.textContent = '$3,000 AI TOOL';
+          reel2.textContent = '$19,458+ AI TOOL';
           reel3.textContent = selected.outcome;
-          machineCaption.textContent = `Lever pulled! Pair "${selected.idea}" with our $3,000 AI system and split the upside.`;
+          machineCaption.textContent = `Lever pulled! Pair "${selected.idea}" with our $19,458+ AI system and split the upside.`;
           pullLeverBtn.disabled = false;
         }
       }, 75);
@@ -80,9 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Form Validation & Submission
   const form = document.getElementById('ideaSubmissionForm');
+  const companyWebsiteInput = document.getElementById('companyWebsite');
   const fullNameInput = document.getElementById('fullName');
   const emailInput = document.getElementById('email');
-  const trafficInput = document.getElementById('trafficSource');
   const coreIdeaInput = document.getElementById('coreIdea');
   const agreedInput = document.getElementById('agreed');
 
@@ -141,20 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
       setFieldError('email', '');
     }
 
-    const traffic = trafficInput.value.trim();
-    if (!traffic.startsWith('https://')) {
-      setFieldError('trafficSource', 'Required. URL must start with https://');
-      valid = false;
-    } else {
-      try {
-        new URL(traffic);
-        setFieldError('trafficSource', '');
-      } catch {
-        setFieldError('trafficSource', 'Please enter a valid URL starting with https://');
-        valid = false;
-      }
-    }
-
     const idea = coreIdeaInput.value.trim();
     if (idea.length < 150) {
       setFieldError(
@@ -189,9 +193,9 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            companyWebsite: companyWebsiteInput ? companyWebsiteInput.value : '',
             fullName: fullNameInput.value.trim(),
             email: emailInput.value.trim(),
-            trafficSource: trafficInput.value.trim(),
             coreIdea: coreIdeaInput.value.trim(),
             agreed: agreedInput.checked
           })
@@ -201,6 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!response.ok || !result.ok) {
           if (result.errors) {
             Object.entries(result.errors).forEach(([key, msg]) => setFieldError(key, msg));
+          } else if (result.error) {
+            setFieldError('coreIdea', result.error);
           }
           submitBtn.disabled = false;
           submitBtnText.textContent = 'Protect & Submit My Idea (Zero Upfront Cost)';

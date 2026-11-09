@@ -401,7 +401,7 @@ body {
 .banner-image {
   width: 100%;
   height: auto;
-  max-height: 340px;
+  max-height: 440px;
   object-fit: cover;
   border-radius: 14px;
   display: block;
@@ -1326,6 +1326,61 @@ body {
   color: var(--accent-lime);
 }
 
+/* Honeypot Anti-bot Trap */
+.hp-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Mobile Navigation Toggle & Drawer */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-menu-toggle {
+  display: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-white);
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.mobile-nav-drawer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 24px 22px;
+  background: rgba(5, 8, 20, 0.98);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.mobile-nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 10px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mobile-nav-cta {
+  margin-top: 6px;
+  width: 100%;
+  padding: 14px;
+}
+
 /* Responsive Breakpoints */
 @media (max-width: 920px) {
   .strategy-grid,
@@ -1347,8 +1402,145 @@ body {
     display: none;
   }
 
+  .mobile-menu-toggle {
+    display: inline-flex;
+  }
+
   .open-letter-card,
   .form-shell {
-    padding: 28px 22px;
+    padding: 32px 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  .navbar {
+    height: 68px;
+  }
+
+  .logo-mark svg {
+    width: 38px;
+    height: 32px;
+  }
+
+  .brand-title {
+    font-size: 0.98rem;
+  }
+
+  .brand-tagline {
+    font-size: 0.54rem;
+  }
+
+  .btn-nav {
+    padding: 8px 13px;
+    font-size: 0.8rem;
+  }
+
+  .btn-nav svg {
+    display: none;
+  }
+
+  .hero-section {
+    padding: 44px 16px 40px;
+  }
+
+  .hero-headline {
+    font-size: clamp(1.85rem, 8vw, 2.45rem);
+    line-height: 1.14;
+  }
+
+  .hero-subheadline {
+    font-size: 0.98rem;
+    margin-bottom: 24px;
+  }
+
+  .live-counter-badge {
+    padding: 10px 16px;
+    border-radius: 18px;
+    gap: 8px;
+  }
+
+  .counter-label {
+    font-size: 0.88rem;
+  }
+
+  .btn-primary.btn-lg {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 0.96rem;
+  }
+
+  .hero-microcopy {
+    font-size: 0.78rem;
+    text-align: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .banner-overlay-stats {
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 10px 6px;
+  }
+
+  .mini-stat-divider {
+    width: 60%;
+    height: 1px;
+  }
+
+  .section-block {
+    padding: 48px 16px;
+  }
+
+  .open-letter-card,
+  .strategy-copy-card,
+  .slot-machine-card,
+  .split-card,
+  .ip-step-card,
+  .form-shell {
+    padding: 24px 18px;
+    border-radius: 18px;
+  }
+
+  .letter-lead {
+    font-size: 1.08rem;
+  }
+
+  .letter-body {
+    font-size: 0.98rem;
+  }
+
+  .ratio-number {
+    font-size: 2.65rem;
+  }
+
+  .split-bar-visual {
+    font-size: 0.64rem;
+    height: 32px;
+  }
+
+  .automation-pipeline-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .pipeline-arrow {
+    display: none;
+  }
+
+  .form-input {
+    font-size: 16px; /* Prevents iOS Safari auto-zoom on input focus */
+  }
+
+  .success-actions {
+    flex-direction: column;
+  }
+
+  .success-actions .btn {
+    width: 100%;
   }
 }
