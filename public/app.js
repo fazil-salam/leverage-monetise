@@ -52,9 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
           const selected = sampleIdeas[leverIndex % sampleIdeas.length];
           leverIndex++;
           reel1.textContent = selected.idea;
-          reel2.textContent = '$19,458+ AI TOOL';
+          reel2.textContent = '$19,458+ STACK & BUYER MATCH';
           reel3.textContent = selected.outcome;
-          machineCaption.textContent = `Lever pulled! Pair "${selected.idea}" with our $19,458+ AI system and split the upside.`;
+          machineCaption.textContent = `Lever pulled! We build "${selected.idea}" with our $19,458+ stack, match it with buyers, and split the upside.`;
           pullLeverBtn.disabled = false;
         }
       }, 75);

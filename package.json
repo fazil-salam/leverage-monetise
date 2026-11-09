@@ -1,7 +1,7 @@
 {
-  "name": "leverage-monetise",
-  "version": "1.0.0",
-  "description": "Leverage Monetise — Exclusive Partnership Hub for AI Income Challenge Members",
+  "name": "the-lever-project",
+  "version": "1.1.0",
+  "description": "The Lever Project — Exclusive Partnership Hub for AI Income Challenge Members",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

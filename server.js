@@ -12,6 +12,7 @@ const nodemailer = require('nodemailer');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const BASE_OFFSET = parseInt(process.env.BASE_COUNTER_OFFSET || '14', 10);
+const SENDER_EMAIL = process.env.SMTP_EMAIL || 'support@theleverproject.com';
 
 // Trust Nginx & Cloudflare reverse proxy for accurate client IP rate-limiting
 app.set('trust proxy', 1);
@@ -38,8 +39,8 @@ app.use(
 
 // Strict CORS Policy
 const allowedOrigins = [
-  'https://leveragemonetise.com',
-  'https://www.leveragemonetise.com',
+  'https://theleverproject.com',
+  'https://www.theleverproject.com',
   'https://fazil.fyi',
   'https://www.fazil.fyi',
   'http://localhost:3000',
@@ -67,15 +68,6 @@ const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { ok: false, error: 'Too many requests from this IP. Please try again shortly.' }
-});
-
-// OTP Request Rate Limiter
-const otpLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 15,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { ok: false, error: 'Too many OTP requests. Please wait a few minutes and try again.' }
 });
 
 // Strict Submission & PDF Generation Rate Limiter
@@ -106,18 +98,6 @@ app.use(
     maxAge: '1h'
   })
 );
-
-// In-memory store for OTP sessions (auto-cleaned after expiry)
-const otpStore = new Map();
-
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, val] of otpStore.entries()) {
-    if (now > val.expiresAt + 10 * 60 * 1000) {
-      otpStore.delete(key);
-    }
-  }
-}, 60 * 1000).unref();
 
 // Sanitize text input (strip control chars, HTML angle brackets, and enforce length)
 function sanitizeText(input, maxLen = 2000) {
@@ -154,7 +134,7 @@ function saveSubmissions(submissions) {
   fs.renameSync(tmpFile, SUBMISSIONS_FILE);
 }
 
-// Generate Single-Page PDF IP Protection Agreement (Strictly 1 Page, Zero Overlap)
+// Generate Single-Page PDF IP Protection Agreement for THE LEVER PROJECT
 function generateAgreementPDF(record, outputPath) {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ size: 'A4', margin: 45 });
@@ -169,11 +149,11 @@ function generateAgreementPDF(record, outputPath) {
         lineBreak: false
       });
     doc.fillColor('#FFFFFF').fontSize(21).font('Helvetica-Bold')
-      .text('LEVERAGE MONETISE', 45, 44, { lineBreak: false });
+      .text('THE LEVER PROJECT', 45, 44, { lineBreak: false });
     doc.fillColor('#388BFF').fontSize(9.5).font('Helvetica')
       .text('PULL THE LEVER TOGETHER  |  VIP Member of AI Income Challenge', 45, 73, { lineBreak: false });
 
-    // Badge on right of header (x: 410..550, y: 27..77) — zero overlap with left title
+    // Badge on right of header (x: 415..550, y: 27..77) — zero overlap with left title
     doc.roundedRect(doc.page.width - 180, 27, 135, 50, 6).fillAndStroke('#11162B', '#388BFF');
     doc.fillColor('#94A3B8').fontSize(7.5).font('Helvetica-Bold')
       .text('UNIQUE TRACKING ID', doc.page.width - 168, 37, { lineBreak: false });
@@ -189,7 +169,7 @@ function generateAgreementPDF(record, outputPath) {
 
     doc.fillColor('#475569').fontSize(9.2).font('Helvetica')
       .text(
-        `This Intellectual Property Ownership & Non-Disclosure Validation Certificate ("Agreement") is automatically executed and registered on ${new Date(record.createdAt).toUTCString()} between Leverage Monetise ("Builder Partner") and ${record.fullName} ("Creator / Idea Partner").`,
+        `This Intellectual Property Ownership & Non-Disclosure Validation Certificate ("Agreement") is automatically executed and registered on ${new Date(record.createdAt).toUTCString()} between The Lever Project ("Builder Partner") and ${record.fullName} ("Creator / Idea Partner").`,
         45, y, { width: doc.page.width - 90, lineGap: 2.5 }
       );
     y = doc.y + 12;
@@ -235,7 +215,7 @@ function generateAgreementPDF(record, outputPath) {
     y += 14;
     doc.fillColor('#334155').fontSize(8.8).font('Helvetica')
       .text(
-        'The Creator retains 100% legal ownership of the underlying Core Idea described above. Leverage Monetise acknowledges that this submission is received in strict confidence solely for the purpose of evaluating and potentially co-building the digital product using our AI software system (valued at $19,458+). Leverage Monetise shall not replicate, commercialize, or distribute the Creator\'s unique concept independently without an active partnership with the Creator.',
+        'The Creator retains 100% legal ownership of the underlying Core Idea described above. The Lever Project acknowledges that this submission is received in strict confidence solely for the purpose of evaluating, building, and matching the digital product with buyers using our $19,458+ software stack. The Lever Project shall not replicate, commercialize, or distribute the Creator\'s unique concept independently without an active partnership with the Creator.',
         45, y, { width: doc.page.width - 90, lineGap: 2 }
       );
     y = doc.y + 12;
@@ -245,9 +225,9 @@ function generateAgreementPDF(record, outputPath) {
     y += 14;
     doc.fillColor('#334155').fontSize(8.8).font('Helvetica')
       .text(
-        'Should this application be selected for development under the AI Income Challenge Partnership Hub, both parties agree to the following transparent two-phase revenue split:\n' +
-        '• Phase 1 (The Recoup Phase — 50/50 Split): All net profits generated by the product are split evenly (50% Creator / 50% Leverage Monetise) until the initial $1,997 USD software and tool investment is recouped.\n' +
-        '• Phase 2 (The Growth Phase — 70/30 Split): Once the initial investment is recouped, the Creator keeps 70% of all future net profits for bringing the core idea and marketing, while Leverage Monetise retains 30% for ongoing technical management, infrastructure, and platform fees.',
+        'Should this application be selected for development under The Lever Project Partnership Hub, both parties agree to the following transparent two-phase revenue split (no social media following is required from the Creator, as our software stack matches the product with buyers):\n' +
+        '• Phase 1 (The Recoup Phase — 50/50 Split): All net profits generated by the product are split evenly (50% Creator / 50% The Lever Project) until the initial $1,997 USD challenge software investment is recouped.\n' +
+        '• Phase 2 (The Growth Phase — 70/30 Split): Once the initial investment is recouped, the Creator keeps 70% of all future net profits for bringing the core idea, while The Lever Project retains 30% for ongoing technical management, buyer matching, and platform fees.',
         45, y, { width: doc.page.width - 90, lineGap: 2 }
       );
     y = doc.y + 12;
@@ -257,7 +237,7 @@ function generateAgreementPDF(record, outputPath) {
     y += 14;
     doc.fillColor('#334155').fontSize(8.8).font('Helvetica')
       .text(
-        'If our engineering and product team requires additional clarity, feature specifications, or audience insights, we will reach out to you directly via email (leveragemonetise@gmail.com) to collaborate and build the most complete, high-converting digital product possible from your idea.',
+        `If our engineering and product team requires additional clarity, feature specifications, or product insights, we will reach out to you directly via email (${SENDER_EMAIL}) to collaborate and build the most complete, high-converting digital product possible from your idea.`,
         45, y, { width: doc.page.width - 90, lineGap: 2 }
       );
     y = doc.y + 18;
@@ -272,17 +252,17 @@ function generateAgreementPDF(record, outputPath) {
     y += 15;
 
     doc.fillColor('#1570EF').fontSize(13).font('Helvetica-BoldOblique')
-      .text('Leverage Monetise', 45, y, { lineBreak: false });
+      .text('The Lever Project', 45, y, { lineBreak: false });
     doc.fillColor('#0F172A').fontSize(13).font('Helvetica-BoldOblique')
       .text(record.fullName, 315, y, { lineBreak: false });
     y += 18;
 
     doc.fillColor('#64748B').fontSize(8).font('Helvetica')
-      .text('Founder, Leverage Monetise (VIP Member of AI Income Challenge)', 45, y, { lineBreak: false });
+      .text('Founder, The Lever Project (VIP Member of AI Income Challenge)', 45, y, { lineBreak: false });
     doc.text(`Digital Timestamp: ${record.createdAt}`, 315, y, { lineBreak: false });
     y += 12;
 
-    doc.text('Email: leveragemonetise@gmail.com', 45, y, { lineBreak: false });
+    doc.text(`Email: ${SENDER_EMAIL}`, 45, y, { lineBreak: false });
     doc.text(`Verification ID: ${record.uniqueId}`, 315, y, { lineBreak: false });
 
     doc.end();
@@ -321,135 +301,6 @@ app.get('/api/stats', async (req, res) => {
     localSubmissions: localCount,
     latestId: `ID-${String(totalProtected).padStart(3, '0')}`,
     nextIdPreview: `ID-${String(nextNumber).padStart(3, '0')}`
-  });
-});
-
-// POST /api/send-otp — Generates 6-digit OTP for phone verification
-app.post('/api/send-otp', otpLimiter, async (req, res) => {
-  try {
-    const { phone, email } = req.body || {};
-    const cleanPhone = normalizePhone(phone);
-    if (!cleanPhone) {
-      return res.status(400).json({
-        ok: false,
-        error: 'Please enter a valid phone number with country code (e.g., +1 437 707 4889).'
-      });
-    }
-
-    const code = String(crypto.randomInt(100000, 999999));
-    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
-    otpStore.set(cleanPhone, {
-      code,
-      expiresAt,
-      attempts: 0,
-      verified: false,
-      token: null
-    });
-
-    let deliveryChannel = 'instant';
-
-    // 1. Optional Twilio SMS Delivery if configured in .env
-    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_FROM_NUMBER) {
-      try {
-        const sid = process.env.TWILIO_ACCOUNT_SID;
-        const auth = Buffer.from(`${sid}:${process.env.TWILIO_AUTH_TOKEN}`).toString('base64');
-        const params = new URLSearchParams({
-          To: cleanPhone,
-          From: process.env.TWILIO_FROM_NUMBER,
-          Body: `[Leverage Monetise] Your phone verification OTP code is: ${code}`
-        });
-        const twRes = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: params.toString()
-        });
-        if (twRes.ok) deliveryChannel = 'sms';
-      } catch (err) {
-        console.error('Twilio SMS error:', err.message);
-      }
-    }
-
-    // 2. Optional Email OTP mirror if SMTP is configured and email provided
-    if (deliveryChannel !== 'sms' && process.env.SMTP_EMAIL && process.env.SMTP_APP_PASSWORD && email) {
-      try {
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.SMTP_EMAIL,
-            pass: process.env.SMTP_APP_PASSWORD
-          }
-        });
-        await transporter.sendMail({
-          from: `"Leverage Monetise" <${process.env.SMTP_EMAIL}>`,
-          to: sanitizeText(email, 160),
-          subject: `Your Verification Code: ${code} — Leverage Monetise`,
-          text: `Your Leverage Monetise verification code for phone number ${cleanPhone} is: ${code}\n\nThis code expires in 10 minutes.`
-        });
-        deliveryChannel = 'email';
-      } catch (err) {
-        console.error('OTP email fallback error:', err.message);
-      }
-    }
-
-    return res.json({
-      ok: true,
-      phone: cleanPhone,
-      deliveryChannel,
-      // When no external SMS gateway is configured yet, return instant dispatch code so the user can complete OTP verification seamlessly
-      dispatchCode: deliveryChannel === 'instant' ? code : undefined,
-      message:
-        deliveryChannel === 'sms'
-          ? `6-digit OTP sent via SMS to ${cleanPhone}.`
-          : `6-digit verification code generated for ${cleanPhone}.`
-    });
-  } catch (err) {
-    console.error('Send OTP error:', err);
-    return res.status(500).json({ ok: false, error: 'Could not generate OTP. Please try again.' });
-  }
-});
-
-// POST /api/verify-otp — Verifies the 6-digit OTP and returns a signed verification token
-app.post('/api/verify-otp', otpLimiter, (req, res) => {
-  const { phone, code } = req.body || {};
-  const cleanPhone = normalizePhone(phone);
-  const cleanCode = String(code || '').replace(/\D/g, '');
-
-  if (!cleanPhone || cleanCode.length !== 6) {
-    return res.status(400).json({ ok: false, error: 'Please enter a valid 6-digit OTP code.' });
-  }
-
-  const entry = otpStore.get(cleanPhone);
-  if (!entry) {
-    return res.status(400).json({ ok: false, error: 'No active OTP found for this phone number. Please click Send OTP first.' });
-  }
-
-  if (Date.now() > entry.expiresAt) {
-    otpStore.delete(cleanPhone);
-    return res.status(400).json({ ok: false, error: 'OTP has expired. Please request a new code.' });
-  }
-
-  entry.attempts += 1;
-  if (entry.attempts > 5) {
-    otpStore.delete(cleanPhone);
-    return res.status(400).json({ ok: false, error: 'Too many incorrect attempts. Please request a new OTP.' });
-  }
-
-  if (entry.code !== cleanCode) {
-    return res.status(400).json({ ok: false, error: 'Incorrect OTP code. Please check and try again.' });
-  }
-
-  const token = crypto.randomBytes(24).toString('hex');
-  entry.verified = true;
-  entry.token = token;
-  otpStore.set(cleanPhone, entry);
-
-  return res.json({
-    ok: true,
-    phone: cleanPhone,
-    phoneVerificationToken: token
   });
 });
 
@@ -517,7 +368,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
     };
 
     // 1. Generate Single-Page PDF IP Agreement
-    const pdfFilename = `Leverage-Monetise-IP-Agreement-${uniqueId}.pdf`;
+    const pdfFilename = `The-Lever-Project-IP-Agreement-${uniqueId}.pdf`;
     const pdfPath = path.join(AGREEMENTS_DIR, pdfFilename);
     await generateAgreementPDF(record, pdfPath);
 
@@ -572,7 +423,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
       }
     }
 
-    // 5. Optional Direct Email Delivery from leveragemonetise@gmail.com
+    // 5. Optional Direct Email Delivery from support@theleverproject.com
     let emailSent = false;
     if (process.env.SMTP_EMAIL && process.env.SMTP_APP_PASSWORD) {
       try {
@@ -585,11 +436,11 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
         });
 
         await transporter.sendMail({
-          from: `"Leverage Monetise" <${process.env.SMTP_EMAIL}>`,
+          from: `"The Lever Project" <${process.env.SMTP_EMAIL}>`,
           to: record.email,
           cc: process.env.SMTP_EMAIL,
-          subject: `[${record.uniqueId}] Your Protected Idea Submission & Signed IP Agreement — Leverage Monetise`,
-          text: `Hi ${record.fullName},\n\nYour idea submission has been logged and assigned Unique ID: ${record.uniqueId}.\n\nAttached to this email is your signed Idea Validation & IP Ownership Agreement cementing your 100% ownership of the core idea.\n\nIf we need more clarity on your concept, we will reach out to you directly through email (leveragemonetise@gmail.com) or your verified phone number (${record.phone}) so we can build the perfect digital product from your idea.\n\nSubmitted Idea Summary:\n"${record.coreIdea}"\n\nBest regards,\nLeverage Monetise\nVIP member of AI Income Challenge\nleveragemonetise@gmail.com`,
+          subject: `[${record.uniqueId}] Your Protected Idea Submission & Signed IP Agreement — The Lever Project`,
+          text: `Hi ${record.fullName},\n\nYour idea submission has been logged and assigned Unique ID: ${record.uniqueId}.\n\nAttached to this email is your signed Idea Validation & IP Ownership Agreement from The Lever Project cementing your 100% ownership of the core idea.\n\nIf we need more clarity on your concept, we will reach out to you directly through email (${SENDER_EMAIL}) so we can build the perfect digital product from your idea.\n\nSubmitted Idea Summary:\n"${record.coreIdea}"\n\nBest regards,\nThe Lever Project\nVIP member of AI Income Challenge\n${SENDER_EMAIL}`,
           attachments: [
             {
               filename: pdfFilename,
@@ -635,7 +486,7 @@ app.get('/api/agreement/:uniqueId', async (req, res) => {
   }
 
   const safeId = String(uniqueId);
-  const pdfPath = path.join(AGREEMENTS_DIR, `Leverage-Monetise-IP-Agreement-${safeId}.pdf`);
+  const pdfPath = path.join(AGREEMENTS_DIR, `The-Lever-Project-IP-Agreement-${safeId}.pdf`);
 
   if (!fs.existsSync(pdfPath)) {
     const submissions = getSubmissions();
@@ -647,10 +498,10 @@ app.get('/api/agreement/:uniqueId', async (req, res) => {
   }
 
   res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `inline; filename="Leverage-Monetise-IP-Agreement-${safeId}.pdf"`);
+  res.setHeader('Content-Disposition', `inline; filename="The-Lever-Project-IP-Agreement-${safeId}.pdf"`);
   fs.createReadStream(pdfPath).pipe(res);
 });
 
 app.listen(PORT, '127.0.0.1', () => {
-  console.log(`🚀 Leverage Monetise server listening securely on 127.0.0.1:${PORT}`);
+  console.log(`🚀 The Lever Project server listening securely on 127.0.0.1:${PORT}`);
 });
